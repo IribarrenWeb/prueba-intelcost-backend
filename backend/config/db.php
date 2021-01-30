@@ -1,12 +1,17 @@
 <?php
 
 class DataBase {
-	protected static $conex;
+    protected static $conex;
+    public static $host = 'localhost';
+    public static $username = 'root';
+    public static $password = '';
+    public static $database = 'intelcost_bienes';
+
 
 	protected static function connect() {
 		try{
 		
-			self::$conex = new PDO('mysql:host=localhost;dbname=intelcost_bienes', 'root', '');
+			self::$conex = new PDO("mysql:host=" . self::$host . ";dbname=" . self::$database, self::$username, self::$password);
 		
 		}catch(PDOException $e){
 
