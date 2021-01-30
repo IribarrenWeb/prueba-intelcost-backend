@@ -2,8 +2,13 @@
 
 require_once '../config/db.php';
 
+/**
+ * Modelo Bien que extiende de la clase DataBase,
+ * que almacena toda la logica que interactua directamente con la base de datos.
+ */
 class Bien extends DataBase
 {
+    // Inicializacion de los atributos del modelo
     private $id;
     private $ciudad_id;
     private $tipo_id;
@@ -49,6 +54,10 @@ class Bien extends DataBase
      */ 
     public function setCiudad_id($ciudadIdName, $search = false)
     {
+        // Verificar si la variable search se encuentra en true
+        // lo que significa que lo que se esta recibiendo en un id 
+        // directamente por lo cual no se necesita ejecutar el metodo setterIds,
+        // que se ejecuta cuando lo que se recibe es un nombre.
         if (!$search) {
             $this->ciudad_id = $this->setterIds($ciudadIdName, 'ciudades');;
         }else{
@@ -73,6 +82,10 @@ class Bien extends DataBase
      */ 
     public function setTipo_id($tipoIdName, $search = false)
     {
+        // Verificar si la variable search se encuentra en true
+        // lo que significa que lo que se esta recibiendo en un id 
+        // directamente por lo cual no se necesita ejecutar el metodo setterIds,
+        // que se ejecuta cuando lo que se recibe es un nombre.
         if(!$search){
             $this->tipo_id = $this->setterIds($tipoIdName, 'tipos_casa');
         }else{
@@ -162,27 +175,23 @@ class Bien extends DataBase
         return $this;
     }
 
-    public static function all(){
 
-        $sql = 'SELECT * FROM bienes ORDER BY id DESC';
-
-		$db = self::connect();
-
-		$query = $db->query($sql);
-
-		$bienes = $query->fetchAll();
-
-		return $bienes;
-
-    }
-
+    /**
+     * Funcion encargada de almacenar el la base de datos
+     * el bien seleccionado.
+     *
+     * @return void
+     */
     public function save(){
 
+        // Sentencia sql con parametros protegidos
         $sql = 'INSERT INTO bienes (`id`, `ciudad_id`, `tipo_id`, `direccion`, `telefono`, `codigo_postal`, `precio`) 
                 VALUES (:id, :ciudadId, :tipoId, :direccion, :telefono, :codigoPostal, :precio)';
         
+        // conexion a la base de datos con PDO
         $db = self::connect();
         
+        // Array utilizado para remplazar los parametros
         $data = [
             'id'           => $this->getId(),
             'ciudadId'     => $this->getCiudad_id(),
@@ -193,12 +202,22 @@ class Bien extends DataBase
             'precio'       => $this->getPrecio()
         ];
 
+        // Preparacion y ejecucion de la sentencia
         $result = $db->prepare($sql)->execute($data);
 
         return $result;
 
     }
 
+
+    /**
+     * Funcion utilizada para settear los ids cuando el parametro que se tiene
+     * es el nombre.
+     *
+     * @param string $tipoName
+     * @param string $tableName
+     * @return string
+     */
     private function setterIds($tipoName, $tableName){
 
         $sql = "SELECT id FROM $tableName WHERE nombre = '$tipoName'";
@@ -213,6 +232,12 @@ class Bien extends DataBase
     
     }
 
+    /**
+     * Funcion utilizada para validar si el registro
+     * ya existe en la base de datos
+     *
+     * @return boolean
+     */
     public function exist(){
 
         $id = $this->getId();
@@ -226,6 +251,13 @@ class Bien extends DataBase
         return $validate || $validate != null ? true : false;
     }
 
+
+    /**
+     * Funcion para obtener de la base de datos
+     * todos los registros que se han guardado con sus respectivas relaciones
+     *
+     * @return object
+     */
     public function saved(){
 
         $sql = 'SELECT b.id, b.direccion, c.nombre as ciudad, b.codigo_postal as codigo, b.telefono, t.nombre as tipo, '. 
@@ -242,6 +274,12 @@ class Bien extends DataBase
 
     }
 
+
+    /**
+     * Funcion utilizada para eliminar un registro de la base de datos
+     *
+     * @return boolean
+     */
     public function deleted(){
 
         $sql = "DELETE FROM bienes WHERE id = :id";
@@ -258,6 +296,13 @@ class Bien extends DataBase
 
     }
 
+
+    /**
+     * Funcion utilizada para filtrar, validar y devolver todos los registros
+     * de bienes que coincidan con los datos de busqueda.
+     *
+     * @return array
+     */
     public function filterReport(){
 
         $tipoId   = $this->getTipo_id();
@@ -298,6 +343,12 @@ class Bien extends DataBase
 
     }
 
+    /**
+     * Funcion utilizada para emitir los reportes
+     *
+     * @param [type] $bienes
+     * @return void
+     */
     public function emitReport($bienes){
 
         $filename = 'reporte-bienes-intelcost.csv';
