@@ -215,7 +215,7 @@ function getMySavedData() {
 }
 
 /**
- * Funcion utilisada para eliminar un registro de bien 
+ * Funcion utilizada para eliminar un registro de bien 
  * almacenado en la base de datos.
  * 
  * @param {string} id 
